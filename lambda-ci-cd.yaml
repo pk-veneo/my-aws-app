@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy IAM user, Lambda function, and required permissions for GitHub CI/CD
+
+Parameters:
+  LambdaFunctionName:
+    Type: String
+    Default: my-fastapi-lambda
+
+Resources:
+
+  GitHubDeployerUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: github-deployer
+
+  GitHubDeployerAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref GitHubDeployerUser
+
+  GitHubDeployerPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: GitHubDeployerPolicy
+      Users:
+        - !Ref GitHubDeployerUser
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - lambda:UpdateFunctionCode
+              - lambda:GetFunction
+              - lambda:InvokeFunction
+              - iam:PassRole
+              - logs:*  # Optional for Lambda log access
+              - s3:GetObject  # If code is stored in S3
+            Resource: "*"
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaBasicExecutionRoleForGitHub
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  MyFastAPILambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref LambdaFunctionName
+      Runtime: python3.10
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Handler: main.lambda_handler
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {
+                  "statusCode": 200,
+                  "body": "Hello from auto-deployed Lambda!"
+              }
+      Timeout: 10
+
+Outputs:
+  IAMAccessKeyId:
+    Description: Access Key ID for GitHub
+    Value: !Ref GitHubDeployerAccessKey
+    Export:
+      Name: GitHubAccessKeyId
+
+  IAMSecretAccessKey:
+    Description: Secret Access Key for GitHub (copy manually after stack deploy)
+    Value: !GetAtt GitHubDeployerAccessKey.SecretAccessKey
+    Export:
+      Name: GitHubSecretAccessKey
+
+  LambdaFunctionName:
+    Description: The Lambda function name to use in GitHub secret
+    Value: !Ref MyFastAPILambda
+    Export:
+      Name: LambdaFunctionName
+
+  LambdaRegion:
+    Description: The AWS region to use in GitHub secret
+    Value: !Ref "AWS::Region"
+    Export:
+      Name: LambdaRegion
