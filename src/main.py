@@ -69,6 +69,7 @@ def handle_get_roster():
 
 def handle_create_roster(event):
     """Create a new training roster"""
+    print("Ho gya bine phatte")
     try:
         # Parse request body
         body = event.get('body', '{}')
