@@ -71,7 +71,24 @@ def handle_create_roster(event):
     """Create a new training roster"""
     try:
         # Parse request body
-        body = json.loads(event.get('body', '{}'))
+        body = event.get('body', '{}')
+        if not body:
+            return create_response(400, {'error': 'Request body is required'})
+        
+        try:
+            body_data = json.loads(body)
+        except json.JSONDecodeError:
+            return create_response(400, {'error': 'Invalid JSON in request body'})
+        
+        # Validate required fields
+        training_name = body_data.get('training_name')
+        if not training_name or not isinstance(training_name, str):
+            return create_response(400, {'error': 'training_name is required and must be a string'})
+        
+        # Validate optional fields
+        participants = body_data.get('participants', [])
+        if not isinstance(participants, list):
+            return create_response(400, {'error': 'participants must be an array'})
         
         # TODO: Implement actual roster creation logic
         # This is a placeholder implementation
@@ -80,14 +97,13 @@ def handle_create_roster(event):
         response_data = {
             'roster_id': roster_id,
             'message': 'Training roster created successfully',
-            'training_name': body.get('training_name', 'Default Training'),
+            'training_name': training_name,
+            'participants_count': len(participants),
             'created_at': datetime.utcnow().isoformat()
         }
         
         return create_response(201, response_data)
         
-    except json.JSONDecodeError:
-        return create_response(400, {'error': 'Invalid JSON in request body'})
     except Exception as e:
         logger.error(f"Error creating roster: {str(e)}")
         return create_response(500, {'error': 'Failed to create roster'})

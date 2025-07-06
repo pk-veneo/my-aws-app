@@ -49,16 +49,6 @@ jobs:
     - name: Install dependencies
       run: . ${{ github.workspace }}/build-scripts/install.sh
 
-    # Debug environment variables
-    - name: Debug environment
-      run: |
-        echo "Environment: ${{ needs.SetEnv.outputs.ENV }}"
-        echo "Environment Lower: ${{ needs.SetEnv.outputs.ENV_LOWER }}"
-        echo "SAM Bucket: ${{ vars.SAM_BUCKET }}"
-        echo "Final Bucket: ${{ vars.SAM_BUCKET }}-${{ needs.SetEnv.outputs.ENV_LOWER }}"
-        echo "Parameter File: params.${{ needs.SetEnv.outputs.ENV_LOWER }}.json"
-        echo "Stack Name: TrainingRosterStack-${{ needs.SetEnv.outputs.ENV_LOWER }}"
-
     # Validate parameter file exists
     - name: Validate parameter file
       run: |
@@ -68,6 +58,12 @@ jobs:
           exit 1
         fi
         echo "Parameter file $PARAM_FILE exists and is valid"
+
+    # Validate SAM template
+    - name: Validate SAM template
+      run: |
+        sam validate --template-file template.yml
+        echo "SAM template validation passed"
 
     # Create S3 bucket if it doesn't exist
     - name: Create S3 bucket if needed
@@ -92,7 +88,7 @@ jobs:
       with:
         name: TrainingRosterStack-${{ needs.SetEnv.outputs.ENV_LOWER }}
         template: template.yml
-        # role-arn: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/TrainingRosterCloudFormationRole
+        role-arn: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/TrainingRosterCloudFormationRole
         parameter-overrides: file://${{ github.workspace }}/params.${{ needs.SetEnv.outputs.ENV_LOWER }}.json
         capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
         no-fail-on-empty-changeset: "1"

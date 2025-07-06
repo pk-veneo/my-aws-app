@@ -2,7 +2,7 @@
 
 A serverless AWS Lambda application for automating training roster management with GitHub Actions CI/CD pipeline.
 
-## 🏗️ Architecture - Part 3
+## 🏗️ Architecture
 
 - **AWS Lambda Function**: Python 3.12 runtime for training roster automation
 - **API Gateway**: RESTful API endpoints for roster management
@@ -39,7 +39,13 @@ Training-roster-automation/
 ├── template.yml                    # SAM template
 ├── params.dev.json                 # Development parameters
 ├── params.qa.json                  # QA parameters
-└── params.prod.json               # Production parameters
+├── params.prod.json               # Production parameters
+├── github-actions-trust-policy.json # GitHub Actions trust policy
+├── cloudformation-execution-role.json # CloudFormation execution role
+├── pass-role-policy.json          # IAM PassRole policy
+├── github-actions-trust-policy-template.json # Template for trust policy
+├── pass-role-policy-template.json # Template for pass role policy
+└── .gitignore                     # Git ignore file
 ```
 
 ## 🔧 Setup Instructions
@@ -53,6 +59,12 @@ Training-roster-automation/
 - `AWS_ACCOUNT_ID`: Your AWS account ID
 - `AWS_ROLE`: IAM role for GitHub Actions
 - `SAM_BUCKET`: Base S3 bucket name (environment will be appended automatically)
+
+### IAM Setup
+1. Create the GitHub Actions trust policy using `github-actions-trust-policy-template.json`
+2. Create the CloudFormation execution role using `cloudformation-execution-role.json`
+3. Create the PassRole policy using `pass-role-policy-template.json`
+4. Replace `ACCOUNT_ID` and `OWNER/REPO_NAME` placeholders in templates
 
 ### Deployment
 1. Push to `dev`, `qa`, or `master` branch
@@ -69,6 +81,8 @@ Training-roster-automation/
 ### Roster Management
 - **GET** `/roster` - Retrieve training roster
 - **POST** `/roster` - Create new training roster
+  - Required: `training_name` (string)
+  - Optional: `participants` (array)
 
 ## 🔒 Security Features
 
@@ -118,7 +132,8 @@ Add Python packages to `requirements.txt` in the `src/` directory.
 ## 🧹 Cleanup Instructions
 
 After successful deployment, you can remove these files:
-- `github-actions-trust-policy.json` - Only needed for initial IAM setup
+- `github-actions-trust-policy-template.json` - Only needed for initial IAM setup
+- `pass-role-policy-template.json` - Only needed for initial IAM setup
 
 ## 📝 License
 

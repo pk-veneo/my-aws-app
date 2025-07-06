@@ -1,46 +1,10 @@
 [
-    {
-      "ParameterKey": "DeployEnvironment",
-      "ParameterValue": "dev"
-    },
-    {
-      "ParameterKey": "AppName",
-      "ParameterValue": "TrainingRosterAutomation"
-    },
-    {
-      "ParameterKey": "CostCenter",
-      "ParameterValue": "4290026"
-    },
-    {
-      "ParameterKey": "CostCenterApprover",
-      "ParameterValue": "VA03964"
-    },
-    {
-      "ParameterKey": "SystemOwner",
-      "ParameterValue": "VA03964"
-    },
-    {
-      "ParameterKey": "SystemCustodian",
-      "ParameterValue": "VA05221"
-    },
-    {
-      "ParameterKey": "PrimaryItContact",
-      "ParameterValue": "VA04393"
-    },
-    {
-      "ParameterKey": "Level1BusinessArea",
-      "ParameterValue": "Training & Development"
-    },
-    {
-      "ParameterKey": "DataClassification",
-      "ParameterValue": "Yellow"
-    },
-    {
-      "ParameterKey": "Hipaa",
-      "ParameterValue": "No"
-    },
-    {
-      "ParameterKey": "LogLevel",
-      "ParameterValue": "INFO"
-    }
-  ]
+  {
+    "ParameterKey": "DeployEnvironment",
+    "ParameterValue": "dev"
+  },
+  {
+    "ParameterKey": "LogLevel",
+    "ParameterValue": "INFO"
+  }
+]
