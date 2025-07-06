@@ -53,7 +53,7 @@ jobs:
     - name: SAM build and package
       run: |
         sam build --template-file ${{ env.TEMPLATE_PATH }}
-        sam package --template-file .aws-sam/build/template.yaml --kms-key-id alias/aws/s3 --s3-bucket ${{ vars.SAM_BUCKET }}-${{ needs.SetEnv.outputs.ENV_LOWER }} --s3-prefix TRAINING-ROSTER-AUTOMATION --output-template-file ${{ env.TEMPLATE_PATH }}
+        sam package --template-file .aws-sam/build/template.yaml --kms-key-id alias/aws/s3 --s3-bucket ${{ vars.SAM_BUCKET }} --s3-prefix TRAINING-ROSTER-AUTOMATION-${{ needs.SetEnv.outputs.ENV_LOWER }} --output-template-file ${{ env.TEMPLATE_PATH }}
 
     # Deploy cloudformation template using aws cloudformation deploy action
     - name: Deploy
