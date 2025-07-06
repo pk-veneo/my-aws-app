@@ -49,11 +49,21 @@ jobs:
     - name: Install dependencies
       run: . ${{ github.workspace }}/build-scripts/install.sh
 
+    # Debug environment variables
+    - name: Debug environment
+      run: |
+        echo "Environment: ${{ needs.SetEnv.outputs.ENV }}"
+        echo "Environment Lower: ${{ needs.SetEnv.outputs.ENV_LOWER }}"
+        echo "SAM Bucket: ${{ vars.SAM_BUCKET }}"
+        echo "Final Bucket: ${{ vars.SAM_BUCKET }}-${{ needs.SetEnv.outputs.ENV_LOWER }}"
+        echo "Parameter File: params.${{ needs.SetEnv.outputs.ENV_LOWER }}.json"
+        echo "Stack Name: TrainingRosterStack-${{ needs.SetEnv.outputs.ENV_LOWER }}"
+
     # SAM build and package
     - name: SAM build and package
       run: |
         sam build --template-file ${{ env.TEMPLATE_PATH }}
-        sam package --template-file .aws-sam/build/template.yaml --kms-key-id alias/aws/s3 --s3-bucket ${{ vars.SAM_BUCKET }} --s3-prefix TRAINING-ROSTER-AUTOMATION-${{ needs.SetEnv.outputs.ENV_LOWER }} --output-template-file ${{ env.TEMPLATE_PATH }}
+        sam package --template-file .aws-sam/build/template.yaml --kms-key-id alias/aws/s3 --s3-bucket ${{ vars.SAM_BUCKET }}-${{ needs.SetEnv.outputs.ENV_LOWER }} --s3-prefix TRAINING-ROSTER-AUTOMATION-${{ needs.SetEnv.outputs.ENV_LOWER }} --output-template-file ${{ env.TEMPLATE_PATH }}
 
     # Deploy cloudformation template using aws cloudformation deploy action
     - name: Deploy

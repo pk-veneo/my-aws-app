@@ -19,18 +19,29 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       DEPLOY_ENV: ${{ steps.getEnv.outputs.depenv }}
+      ENV_LOWER: ${{ steps.getEnv.outputs.env_lower }}
     steps: 
     - name: Get name from branch
       id: getEnv
       run: |
         BRANCH=$(echo $GITHUB_REF | cut -d'/' -f 3)
+        echo "Branch name: $BRANCH"
+        echo "GITHUB_REF: $GITHUB_REF"
+        
         if [[ $BRANCH == 'main' || $BRANCH == 'master' ]]; then
           echo "depenv=PROD" >> $GITHUB_OUTPUT
           echo "env_lower=prod" >> $GITHUB_OUTPUT
+          echo "Setting environment to PROD/prod"
         elif [[ $BRANCH == 'qa' ]]; then 
           echo "depenv=QA" >> $GITHUB_OUTPUT
           echo "env_lower=qa" >> $GITHUB_OUTPUT
+          echo "Setting environment to QA/qa"
         elif [[ $BRANCH == 'dev' ]]; then 
           echo "depenv=DEV" >> $GITHUB_OUTPUT
           echo "env_lower=dev" >> $GITHUB_OUTPUT
+          echo "Setting environment to DEV/dev"
+        else
+          echo "depenv=DEV" >> $GITHUB_OUTPUT
+          echo "env_lower=dev" >> $GITHUB_OUTPUT
+          echo "Unknown branch, defaulting to DEV/dev"
         fi 
