@@ -32,12 +32,12 @@ Training-roster-automation/
 │   │   ├── deploy.yml              # Main CI/CD workflow
 │   │   └── get-deploy-env.yml     # Environment detection
 ├── src/
-│   └── main.py                     # Lambda function code
+│   ├── main.py                     # Lambda function code
+│   └── requirements.txt            # Python dependencies
 ├── build-scripts/
 │   └── install.sh                  # Dependency installation
 ├── template.yml                    # SAM template
-├── params.dev.json                 # Development parameters
-└── requirements.txt                # Python dependencies
+└── params.dev.json                 # Development parameters
 ```
 
 ## 🔧 Setup Instructions

@@ -8,15 +8,28 @@
 
 install_dependencies() {
   echo "Installing Python lambda code dependencies"
-  for function_directory in ${GITHUB_WORKSPACE}/src/* ; do
-    cd ${function_directory}
-    if [ -f "requirements.txt" ]; then
-      echo "  Installing dependencies for ${function_directory}"
-      pip install -r requirements.txt
-    fi
-    if [ -f "package.json" ]; then
-      echo "  Installing dependencies for ${function_directory}"
-      npm install
+  
+  # Check if src directory exists and has requirements.txt
+  if [ -d "${GITHUB_WORKSPACE}/src" ] && [ -f "${GITHUB_WORKSPACE}/src/requirements.txt" ]; then
+    echo "  Installing dependencies for ${GITHUB_WORKSPACE}/src"
+    cd ${GITHUB_WORKSPACE}/src
+    pip install -r requirements.txt
+  elif [ -d "${GITHUB_WORKSPACE}/src" ]; then
+    echo "  No requirements.txt found in src directory, skipping dependency installation"
+  fi
+  
+  # Check for any subdirectories in src that might have their own requirements
+  for function_directory in ${GITHUB_WORKSPACE}/src/*/ ; do
+    if [ -d "${function_directory}" ]; then
+      cd ${function_directory}
+      if [ -f "requirements.txt" ]; then
+        echo "  Installing dependencies for ${function_directory}"
+        pip install -r requirements.txt
+      fi
+      if [ -f "package.json" ]; then
+        echo "  Installing dependencies for ${function_directory}"
+        npm install
+      fi
     fi
   done
 }
