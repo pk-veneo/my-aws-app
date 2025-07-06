@@ -1,0 +1,36 @@
+# WORKING:
+# This workflow can be used to get get environment from Branch which will run github Workflow.
+# This action can be used to run jobs based on dynamic environment
+
+name: 'Get Github Environment'
+
+on:
+  workflow_call:
+    outputs:
+      ENV:
+        description: 'environment for deployment'
+        value: ${{ jobs.SetEnv.outputs.DEPLOY_ENV }}
+      ENV_LOWER:
+        description: 'lowercase environment for bucket naming'
+        value: ${{ jobs.SetEnv.outputs.ENV_LOWER }}
+
+jobs:
+  SetEnv:
+    runs-on: ubuntu-latest
+    outputs:
+      DEPLOY_ENV: ${{ steps.getEnv.outputs.depenv }}
+    steps: 
+    - name: Get name from branch
+      id: getEnv
+      run: |
+        BRANCH=$(echo $GITHUB_REF | cut -d'/' -f 3)
+        if [[ $BRANCH == 'main' || $BRANCH == 'master' ]]; then
+          echo "depenv=PROD" >> $GITHUB_OUTPUT
+          echo "env_lower=prod" >> $GITHUB_OUTPUT
+        elif [[ $BRANCH == 'qa' ]]; then 
+          echo "depenv=QA" >> $GITHUB_OUTPUT
+          echo "env_lower=qa" >> $GITHUB_OUTPUT
+        elif [[ $BRANCH == 'dev' ]]; then 
+          echo "depenv=DEV" >> $GITHUB_OUTPUT
+          echo "env_lower=dev" >> $GITHUB_OUTPUT
+        fi 

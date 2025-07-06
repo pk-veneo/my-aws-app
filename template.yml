@@ -1,0 +1,188 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: 'AWS::Serverless-2016-10-31'
+
+Description: >
+  Training Roster Automation Lambda Function
+
+Parameters:
+  DeployEnvironment:
+    Type: String
+    AllowedValues:
+      - dev
+      - qa
+      - prod
+    ConstraintDescription: must specify development, test, or prod.
+  AppName:
+    Type: String
+    Default: TrainingRosterAutomation
+  CostCenter:
+    Type: String
+    Default: "4290026"
+  CostCenterApprover:
+    Type: String
+    Default: "VA03964"
+  SystemOwner:
+    Type: String
+    Default: "VA03964"
+  SystemCustodian:
+    Type: String
+    Default: "VA05221"
+  PrimaryItContact:
+    Type: String
+    Default: "VA04393"
+  Level1BusinessArea:
+    Type: String
+    Default: "Training & Development"
+  DataClassification:
+    Type: String
+    AllowedValues:
+      - "Green"
+      - "Yellow"
+      - "Orange"
+      - "Red"
+      - "TBD"
+    Default: "Yellow"
+  Hipaa:
+    Type: String
+    AllowedValues:
+      - "Yes"
+      - "No"
+      - "TBD"
+    Default: "No"
+  LogLevel:
+    Type: String
+    Default: INFO
+    AllowedValues:
+      - DEBUG
+      - INFO
+      - WARN
+      - ERROR
+      - NONE
+
+Mappings:
+  EnvironmentConfiguration:
+    dev:
+      GatewayStageName: Dev
+    qa:
+      GatewayStageName: QA
+    prod:
+      GatewayStageName: Prod
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.12
+    Tracing: Active
+
+Resources:
+  # API Gateway Account Configuration for CloudWatch Logging
+  ApiGatewayAccountConfig:
+    Type: "AWS::ApiGateway::Account"
+    Properties:
+      CloudWatchRoleArn: !GetAtt "ApiGatewayLoggingRole.Arn"
+
+  ApiGatewayLoggingRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "apigateway.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Path: "/"
+      ManagedPolicyArns:
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+      # PermissionsBoundary: !Sub "arn:aws:iam::${AWS::AccountId}:policy/LZ-IAM-Boundary"
+          
+  # Main Training Roster Lambda Function
+  TrainingRosterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: main.lambda_handler
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+          DEPLOY_ENVIRONMENT: !Ref DeployEnvironment
+      Tags:
+        CostCenter: !Ref CostCenter
+        CostCenterApprover: !Ref CostCenterApprover
+        SystemOwner: !Ref SystemOwner
+        SystemCustodian: !Ref SystemCustodian
+        PrimaryItContact: !Ref PrimaryItContact
+        Level1BusinessArea: !Ref Level1BusinessArea
+        DataClassification: !Ref DataClassification
+        Hipaa: !Ref Hipaa
+        Application: !Ref AppName
+
+  # API Gateway
+  TrainingRosterApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !FindInMap [EnvironmentConfiguration, !Ref DeployEnvironment, GatewayStageName]
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          title: Training Roster Automation API
+          version: 1.0.0
+        paths:
+          /health:
+            get:
+              x-amazon-apigateway-integration:
+                lambdaUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TrainingRosterFunction.Arn}/invocations"
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                type: aws_proxy
+              responses:
+                '200':
+                  description: OK
+          /roster:
+            get:
+              x-amazon-apigateway-integration:
+                lambdaUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TrainingRosterFunction.Arn}/invocations"
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                type: aws_proxy
+              responses:
+                '200':
+                  description: OK
+            post:
+              x-amazon-apigateway-integration:
+                lambdaUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TrainingRosterFunction.Arn}/invocations"
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                type: aws_proxy
+              responses:
+                '200':
+                  description: OK
+
+  # Lambda Permission for API Gateway
+  TrainingRosterFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref TrainingRosterFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${TrainingRosterApi}/*/*"
+
+Outputs:
+  TrainingRosterFunctionArn:
+    Description: ARN of the Training Roster Lambda Function
+    Value: !GetAtt TrainingRosterFunction.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-TrainingRosterFunctionArn"
+
+  TrainingRosterApiUrl:
+    Description: URL of the Training Roster API Gateway
+    Value: !Sub "https://${TrainingRosterApi}.execute-api.${AWS::Region}.amazonaws.com/${TrainingRosterApi.Stage}"
+    Export:
+      Name: !Sub "${AWS::StackName}-TrainingRosterApiUrl"
+
+  TrainingRosterFunctionName:
+    Description: Name of the Training Roster Lambda Function
+    Value: !Ref TrainingRosterFunction
+    Export:
+      Name: !Sub "${AWS::StackName}-TrainingRosterFunctionName"
