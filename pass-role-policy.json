@@ -4,8 +4,7 @@
       {
         "Effect": "Allow",
         "Action": "iam:PassRole",
-        "Resource": "arn:aws:iam::898465023829:role/GitHubActionsDeploymentRole"
+        "Resource": "arn:aws:iam::898465023829:role/TrainingRosterCloudFormationRole"
       }
     ]
   }
-  
