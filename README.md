@@ -115,6 +115,11 @@ Add Python packages to `requirements.txt` in the `src/` directory.
 - Review CloudWatch logs for Lambda function issues
 - Verify CloudFormation stack events for deployment problems
 
+## 🧹 Cleanup Instructions
+
+After successful deployment, you can remove these files:
+- `github-actions-trust-policy.json` - Only needed for initial IAM setup
+
 ## 📝 License
 
 This project follows enterprise security and compliance standards.
