@@ -2,7 +2,7 @@
 
 A serverless AWS Lambda application for automating training roster management with GitHub Actions CI/CD pipeline.
 
-## 🏗️ Architecture - Part 2
+## 🏗️ Architecture - Part 3
 
 - **AWS Lambda Function**: Python 3.12 runtime for training roster automation
 - **API Gateway**: RESTful API endpoints for roster management
