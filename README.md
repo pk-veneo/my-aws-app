@@ -37,7 +37,9 @@ Training-roster-automation/
 ├── build-scripts/
 │   └── install.sh                  # Dependency installation
 ├── template.yml                    # SAM template
-└── params.dev.json                 # Development parameters
+├── params.dev.json                 # Development parameters
+├── params.qa.json                  # QA parameters
+└── params.prod.json               # Production parameters
 ```
 
 ## 🔧 Setup Instructions
@@ -51,8 +53,6 @@ Training-roster-automation/
 - `AWS_ACCOUNT_ID`: Your AWS account ID
 - `AWS_ROLE`: IAM role for GitHub Actions
 - `SAM_BUCKET`: Base S3 bucket name (environment will be appended automatically)
-- `APP_STACK_NAME`: CloudFormation stack name
-- `PARAMETER_FILE_NAME`: Parameter file name (e.g., `params.dev.json`)
 
 ### Deployment
 1. Push to `dev`, `qa`, or `master` branch
