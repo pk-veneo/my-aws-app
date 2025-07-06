@@ -1,0 +1,39 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:DeleteBucket",
+        "s3:GetBucketLocation",
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::*-dev",
+        "arn:aws:s3:::*-qa", 
+        "arn:aws:s3:::*-prod",
+        "arn:aws:s3:::*-dev/*",
+        "arn:aws:s3:::*-qa/*",
+        "arn:aws:s3:::*-prod/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Resource": "arn:aws:iam::898465023829:role/TrainingRosterCloudFormationRole"
+    }
+  ]
+} 
