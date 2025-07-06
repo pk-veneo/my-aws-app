@@ -85,24 +85,12 @@ Resources:
           LOG_LEVEL: !Ref LogLevel
           DEPLOY_ENVIRONMENT: !Ref DeployEnvironment
       Events:
-        HealthCheck:
-          Type: Api
-          Properties:
-            RestApiId: !Ref TrainingRosterApi
-            Path: /health
-            Method: get
         GetRoster:
           Type: Api
           Properties:
             RestApiId: !Ref TrainingRosterApi
             Path: /roster
             Method: get
-        CreateRoster:
-          Type: Api
-          Properties:
-            RestApiId: !Ref TrainingRosterApi
-            Path: /roster
-            Method: post
       Tags:
         Application: TrainingRosterAutomation
         Environment: !Ref DeployEnvironment
