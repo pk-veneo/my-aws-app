@@ -243,6 +243,7 @@ Resources:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: "Subnet group for Aurora cluster"
+      Role: !GetAtt CloudFormationExecutionRole.Arn
       SubnetIds:
         - !Ref MySubnet1
         - !Ref MySubnet2
