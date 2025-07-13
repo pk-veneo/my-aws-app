@@ -162,34 +162,13 @@ Resources:
                   - rds:*
                 Resource: "*"
 
-  LambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-            Action: sts:AssumeRole
-      Path: "/"
-      Policies:
-        - PolicyName: LambdaAdminPolicy
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action: "*"
-                Resource: "*"
-
   # Main Training Roster Lambda Function
   TrainingRosterFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
       Handler: main.lambda_handler
-      Role: !GetAtt LambdaExecutionRole.Arn
+      Role: !GetAtt CloudFormationExecutionRole.Arn
       Environment:
         Variables:
           LOG_LEVEL: !Ref LogLevel
@@ -312,6 +291,3 @@ Outputs:
   CloudFormationExecutionRoleArn:
     Description: "ARN of the CloudFormation execution role"
     Value: !GetAtt CloudFormationExecutionRole.Arn
-  LambdaExecutionRoleArn:
-    Description: "ARN of the Lambda execution role"
-    Value: !GetAtt LambdaExecutionRole.Arn
