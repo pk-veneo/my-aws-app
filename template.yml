@@ -109,6 +109,22 @@ Resources:
                 Resource: "*"
               - Effect: Allow
                 Action:
+                  - rds:CreateDBInstance
+                  - rds:DeleteDBInstance
+                  - rds:DescribeDBInstances
+                  - rds:ModifyDBInstance
+                  - rds:StartDBInstance
+                  - rds:StopDBInstance
+                  - rds:RebootDBInstance
+                  - rds:DeleteDBSubnetGroup
+                  - rds:CreateDBSubnetGroup
+                  - rds:CreateDBCluster
+                  - rds:DeleteDBCluster
+                  - rds:DescribeDBClusters
+                  - rds:ModifyDBCluster
+                Resource: "*"
+              - Effect: Allow
+                Action:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
@@ -243,7 +259,6 @@ Resources:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: "Subnet group for Aurora cluster"
-      Role: !GetAtt CloudFormationExecutionRole.Arn
       SubnetIds:
         - !Ref MySubnet1
         - !Ref MySubnet2
