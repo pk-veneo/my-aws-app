@@ -175,21 +175,12 @@ Resources:
             Action: sts:AssumeRole
       Path: "/"
       Policies:
-        - PolicyName: LambdaBasicExecution
+        - PolicyName: LambdaAdminPolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Action:
-                  - logs:CreateLogGroup
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                Resource: "arn:aws:logs:*:*:*"
-              - Effect: Allow
-                Action:
-                  - rds:DescribeDBClusters
-                  - rds:DescribeDBInstances
-                  - rds:Connect
+                Action: "*"
                 Resource: "*"
 
   # Main Training Roster Lambda Function
