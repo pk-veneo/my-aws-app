@@ -90,5 +90,5 @@ jobs:
         template: template.yml
         role-arn: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/TrainingRosterCloudFormationRole
         parameter-overrides: file://${{ github.workspace }}/params.${{ needs.SetEnv.outputs.ENV_LOWER }}.json
-        capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+        capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND,CAPABILITY_NAMED_IAM
         no-fail-on-empty-changeset: "1"
