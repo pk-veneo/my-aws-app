@@ -4,7 +4,7 @@ This guide will help you set up the required IAM roles and policies to fix the C
 
 ## 🔧 Required IAM Setup
 
-### 1. Create CloudFormation Execution Role
+### 1. Create CloudFormation Execution Role part 1
 
 First, create the CloudFormation execution role with the trust policy:
 
