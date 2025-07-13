@@ -59,19 +59,67 @@ Resources:
       ManagedPolicyArns:
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
           
-  # Lambda Execution Role
+  CloudFormationExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: CloudFormationEC2RDSPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:CreateVpc
+                  - ec2:CreateSubnet
+                  - ec2:CreateSecurityGroup
+                  - ec2:Describe* 
+                  - ec2:DeleteVpc
+                  - ec2:DeleteSubnet
+                  - ec2:DeleteSecurityGroup
+                  - ec2:ModifyVpcAttribute
+                  - ec2:CreateTags
+                  - rds:*
+                  - iam:PassRole
+                Resource: "*"
+
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
-              Service: lambda.amazonaws.com
+              Service:
+                - lambda.amazonaws.com
             Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: "/"
+      Policies:
+        - PolicyName: LambdaBasicExecution
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "arn:aws:logs:*:*:*"
+              - Effect: Allow
+                Action:
+                  - rds:DescribeDBClusters
+                  - rds:DescribeDBInstances
+                  - rds:Connect
+                Resource: "*"
 
   # Main Training Roster Lambda Function
   TrainingRosterFunction:
@@ -198,3 +246,10 @@ Outputs:
     Value: !Ref TrainingRosterFunction
     Export:
       Name: !Sub "${AWS::StackName}-TrainingRosterFunctionName"
+
+  CloudFormationExecutionRoleArn:
+    Description: "ARN of the CloudFormation execution role"
+    Value: !GetAtt CloudFormationExecutionRole.Arn
+  LambdaExecutionRoleArn:
+    Description: "ARN of the Lambda execution role"
+    Value: !GetAtt LambdaExecutionRole.Arn
